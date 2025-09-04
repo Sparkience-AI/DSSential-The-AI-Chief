@@ -402,7 +402,7 @@ class DecisionSupportSystem:
         try:
             if 'GOOGLE_API_KEY' in st.secrets:
                 genai.configure(api_key=st.secrets['GOOGLE_API_KEY'])
-                self.llm = genai.GenerativeModel('gemini-pro')
+                self.llm = genai.GenerativeModel('gemini-2.5-flash')
             else:
                 st.warning("Google API Key not found in secrets. AI insights will be disabled.")
                 self.llm = None
@@ -1302,4 +1302,5 @@ def main():
         """)
 
 if __name__ == "__main__":
+
     main()
