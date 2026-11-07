@@ -1,0 +1,20 @@
+# DSSential
+
+> DSSential is a local-first, open-source decision-analysis workbench. Its supported core provides
+> validated transparent forecasting and bounded arithmetic scenario previews. AI narration is
+> optional and is never authoritative for calculations.
+
+- Repository: https://github.com/Sparkience-AI/DSSential-The-AI-Chief
+- README: ./README.md
+- Privacy and data flow: ./PRIVACY.md
+- Security policy: ./SECURITY.md
+
+Supported facts:
+- Forecasts require real, unique, ordered, regular timestamps plus a confirmed frequency and unit.
+- Models are compared with time-ordered rolling validation against naive baselines.
+- Forecast intervals are empirical holdout error bands, not guarantees.
+- Scenarios are arithmetic previews, not predicted outcomes or Monte Carlo risk models.
+- Cloud narration requires a user API key and explicit provider-specific consent.
+
+Not supported: causal inference, autonomous decisions, arbitrary code execution, Monte Carlo
+outcome simulation, VaR/CVaR, Sobol sensitivity claims, or optimization claims.
