@@ -1,0 +1,4 @@
+interface:
+  display_name: "DSSential Decision Analysis"
+  short_description: "Validated forecasts and scenario previews"
+  default_prompt: "Use $dssential-decision-analysis to validate this forecast request and explain its evidence limits."

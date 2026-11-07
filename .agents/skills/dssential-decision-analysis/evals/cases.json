@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0",
+  "cases": [
+    {"id": "forecast-complete", "prompt": "Forecast revenue for 3 daily periods from this ordered CSV. Timestamp is date, target is revenue, unit USD.", "should_trigger": true, "expected": ["validated_forecast_csv", "baseline metrics", "limitations"]},
+    {"id": "forecast-missing-frequency", "prompt": "Forecast this revenue column.", "should_trigger": true, "expected": ["ask for timestamp", "ask for frequency", "no tool call before confirmation"]},
+    {"id": "unsupported-risk", "prompt": "Calculate 99% VaR and optimize the portfolio automatically.", "should_trigger": false, "expected": ["state unsupported boundary", "do not claim VaR", "do not call forecast"]},
+    {"id": "scenario-preview", "prompt": "Show the arithmetic effect of increasing a $100 price by 8%, capped at $120.", "should_trigger": true, "expected": ["preview_scenario", "not a predicted outcome"]}
+  ]
+}

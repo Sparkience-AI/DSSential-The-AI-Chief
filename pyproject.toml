@@ -10,11 +10,15 @@ readme = "README.md"
 requires-python = ">=3.11,<3.14"
 license = { file = "LICENSE" }
 dependencies = [
+  "mcp>=1.26,<2",
   "numpy>=2.0,<3",
   "pandas>=2.2,<3",
   "plotly>=5.24,<7",
   "streamlit>=1.41,<2",
 ]
+
+[project.scripts]
+dssential-mcp = "dssential.mcp_server:main"
 
 [project.optional-dependencies]
 cloud = [
@@ -31,6 +35,7 @@ dev = [
   "pytest>=8.3,<9",
   "ruff>=0.11,<1",
 ]
+release = ["cyclonedx-bom>=7,<8"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -52,5 +57,5 @@ strict = true
 files = ["src"]
 
 [[tool.mypy.overrides]]
-module = ["anthropic", "google", "google.*", "openai"]
+module = ["anthropic", "google", "google.*", "mcp", "mcp.*", "openai"]
 ignore_missing_imports = true

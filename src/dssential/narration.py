@@ -74,7 +74,12 @@ def generate_narration(
                 max_tokens=1_500,
                 messages=[{"role": "user", "content": prompt}],
             )
-            text = "".join(block.text for block in response.content if block.type == "text")
+            text_parts: list[str] = []
+            for block in response.content:
+                block_text = getattr(block, "text", None)
+                if getattr(block, "type", None) == "text" and isinstance(block_text, str):
+                    text_parts.append(block_text)
+            text = "".join(text_parts)
         elif config.provider == "Gemini":
             if client is None:
                 from google import genai

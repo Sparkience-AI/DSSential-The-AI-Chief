@@ -43,6 +43,12 @@ streamlit run app.py
 Cloud packages are optional. Install `-e .` instead if you only need local deterministic analysis.
 No application key is required for forecasts or scenario previews.
 
+## Local MCP and agent skill
+
+Install the project, then run `dssential-mcp`. The server uses local stdio only and exposes capability discovery, a bounded inline-CSV validated forecast, and transparent scenario arithmetic. It opens no network port and never calls a model provider. The repo-local `dssential-decision-analysis` skill under `.agents/skills/` teaches compatible agents when to ask for missing time-series semantics, how to report baseline evidence, and when to refuse unsupported claims.
+
+The MCP CSV payload limit is 2 MiB. Use the Streamlit application for larger supported local files.
+
 ## Optional BYOK narration
 
 Choose Gemini, OpenAI, or Anthropic in the sidebar, edit the model ID if needed, enter a session-only
@@ -69,7 +75,8 @@ CI runs quality checks and wheel smoke tests on Python 3.11, 3.12, and 3.13.
 Forecasts and intervals are evidence for review, not guarantees or professional advice. The first
 validated model family is deliberately small and transparent. Structural breaks, causal effects,
 and business actions require domain review outside this tool. See [PRIVACY.md](PRIVACY.md) and
-[SECURITY.md](SECURITY.md).
+[SECURITY.md](SECURITY.md), the [threat model](docs/threat-model.md), and the
+[release-readiness contract](docs/release-readiness.md).
 
 ## License
 
