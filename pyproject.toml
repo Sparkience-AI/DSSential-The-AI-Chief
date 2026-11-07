@@ -47,7 +47,7 @@ target-version = "py311"
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 strict = true
 files = ["src"]
 
