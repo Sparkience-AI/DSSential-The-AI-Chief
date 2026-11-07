@@ -1,111 +1,76 @@
-# 🌟 **DSSential: The AI Chief** 🌟
+# DSSential: validated decision analysis
 
-## Overview
+DSSential is a local-first, open-source workbench for transparent forecasting and scenario
+exploration. It is designed for analysts who need reproducible evidence rather than autonomous
+decisions. Deterministic calculations are authoritative; Gemini, OpenAI, or Anthropic can
+optionally narrate the displayed validated summary with your own API key.
 
-Welcome to **DSSential: The AI Chief** — your next-gen **Advanced Decision Support System** 🚀! This powerful tool integrates cutting-edge AI and statistical modeling techniques to help businesses make smarter, data-driven decisions. From **time series forecasting** to **sensitivity analysis** and **goal optimization**, we've got it all to empower your decision-making 🔮.
+## Supported workflows
 
-## Key Features
+### Validated forecasting
 
-- 📊 **Data Upload & Overview**: Easily upload your datasets, and automatically perform quality checks and visualizations.
-- 🔮 **Time Series Forecasting**: Make precise predictions with confidence intervals using the **Prophet** model. Anticipate future trends and risks!
-- 🔍 **What-If Analysis**: Simulate different scenarios and assess the impact of changes on your outcomes with **Monte Carlo** simulations.
-- ⚙️ **Sensitivity Analysis**: Understand how sensitive your model is to changes in input parameters and identify critical drivers of your results.
-- 🧩 **Scenario Analysis**: Compare different business scenarios and evaluate risks and rewards through Monte Carlo simulations.
-- 🎯 **Goal Setting Optimization**: Use **Optuna** to fine-tune your model parameters and achieve your business goals with precision.
+- Requires a real timestamp column, confirmed frequency, target column, and unit.
+- Refuses missing, duplicate, unsorted, irregular, non-finite, or fabricated time semantics.
+- Preserves the original target scale and never silently imputes or scales source data.
+- Compares linear trend with last-value and optional seasonal-naive baselines.
+- Uses separate time-ordered rolling origins for model selection, interval calibration, and final
+  empirical coverage checks.
+- Selects linear trend only when it improves selection-set MAE over the best naive baseline by at
+  least 5%; otherwise the result is explicitly `baseline_only`.
+- Records the input fingerprint, specification, method/runtime versions, warnings, limitations,
+  result hash, unique run ID, and stable reproducibility hash.
 
-## 🚀 Technology Stack
+### Transparent scenario preview
 
-- **Python Libraries**:
-  - 🖥️ **Streamlit**: Build interactive web applications.
-  - 📊 **Pandas** & **NumPy**: Efficient data manipulation and numerical analysis.
-  - 📈 **Plotly**: Create interactive and beautiful plots and charts.
-  - 🔮 **Prophet**: Time series forecasting at its finest.
-  - 🧠 **Google Gemini API**: Get AI-generated insights from large language models (LLMs).
-  - ⚙️ **Optuna**: Optimize parameters and models.
-  - 🧮 **SALib**: Perform advanced sensitivity and scenario analysis.
-  - 🔬 **Scipy**: Statistical modeling and Monte Carlo simulations.
+Apply a percent, absolute, or set-value adjustment with explicit units and optional bounds. This is
+an arithmetic preview of an input—not a predicted outcome. DSSential does not currently claim
+Monte Carlo outcome simulation, VaR/CVaR, Sobol sensitivity, causal impact, or optimization.
 
-## ✨ How It Works
+## Run locally
 
-### 1. **Data Upload & Overview** 📥
-   - Upload your CSV files for automatic **data preprocessing**, **imputation**, and **scaling**.
-   - Explore the dataset with **visualizations** and **data quality checks** to ensure clean, insightful analysis.
+Python 3.11–3.13 is supported.
 
-### 2. **Time Series Forecasting** 🔮
-   - Select a target variable for forecasting and use **Prophet** to generate predictions.
-   - Visualize historical data and future forecasts, with confidence intervals and trend lines.
+```bash
+git clone https://github.com/Sparkience-AI/DSSential-The-AI-Chief.git
+cd DSSential-The-AI-Chief
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
+python -m pip install -e ".[cloud]"
+streamlit run app.py
+```
 
-### 3. **What-If Analysis** 🤔
-   - Simulate "what-if" scenarios by tweaking key variables.
-   - **Monte Carlo simulations** help assess uncertainty and calculate the potential impact of different changes.
+Cloud packages are optional. Install `-e .` instead if you only need local deterministic analysis.
+No application key is required for forecasts or scenario previews.
 
-### 4. **Sensitivity Analysis** 🎯
-   - Evaluate how changes in input parameters affect your target variable.
-   - Use **Sobol sensitivity analysis** to identify which variables matter most.
+## Optional BYOK narration
 
-### 5. **Scenario Analysis** 🧩
-   - Compare multiple scenarios with adjustable parameters.
-   - Perform simulations using **Monte Carlo** to evaluate risks and opportunities.
+Choose Gemini, OpenAI, or Anthropic in the sidebar, edit the model ID if needed, enter a session-only
+API key, inspect the exact JSON summary, and check the provider-specific transmission consent box.
+Only that bounded summary is transmitted. Raw rows and keys are excluded. Changing provider, model,
+dataset, or forecast invalidates stale narration. OpenAI calls use the Responses API with
+`store=False`.
 
-### 6. **Goal Setting Optimization** 🎯
-   - Optimize your model's parameters with **Optuna** to achieve your desired business outcomes.
-   - Use **multi-objective optimization** to explore the best solutions for your goals.
+## Validation and development
 
-## 🤖 **AI Insights**
+```bash
+uv sync --group dev
+ruff check .
+ruff format --check .
+mypy
+pytest
+python -m build
+```
 
-AI-generated insights powered by **Google Gemini** provide an extra layer of analysis! 💡
-- Trend analysis 📈
-- Risk assessment ⚠️
-- Recommendations 💡
-- Identifying significant changes 📊
+CI runs quality checks and wheel smoke tests on Python 3.11, 3.12, and 3.13.
 
-## 🛠️ Installation
+## Boundaries
 
-To run **DSSential** locally:
+Forecasts and intervals are evidence for review, not guarantees or professional advice. The first
+validated model family is deliberately small and transparent. Structural breaks, causal effects,
+and business actions require domain review outside this tool. See [PRIVACY.md](PRIVACY.md) and
+[SECURITY.md](SECURITY.md).
 
-1. Clone the repo:
-   ```bash
-   git clone https://github.com/your-username/dssential.git
-   cd dssential
-   ```
+## License
 
-2. Install the required dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Run the application:
-   ```bash
-   streamlit run app.py
-   ```
-
-## 🌍 Example Usage
-
-1. **Data Upload & Overview** 📥: Upload a CSV and get an instant data overview, including quality checks, visualizations, and insights.
-   
-2. **Forecasting** 🔮: Select a column to forecast. The system trains a **Prophet** model and displays the forecast along with confidence intervals and trends.
-
-3. **What-If Analysis** 🤔: Modify variables and simulate scenarios to see how they affect business outcomes. Visualize the distribution of possible results with Monte Carlo simulations.
-
-4. **Sensitivity & Scenario Analysis** 🎯: Perform Sobol sensitivity analysis to understand variable importance, and simulate various business scenarios to compare outcomes.
-
-5. **Goal Setting Optimization** 🎯: Define your optimization goals and use **Optuna** to fine-tune parameters, achieving the best outcomes for your business.
-
-## 🧑‍💻 Contributing
-
-Want to contribute to **DSSential**? Awesome! 🤩 Here's how:
-1. Fork the repo.
-2. Create a new branch (`git checkout -b feature/your-feature-name`).
-3. Commit your changes (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature/your-feature-name`).
-5. Open a Pull Request!
-
-## 📜 License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-**DSSential** is your all-in-one decision-making companion 🌟! Whether you're forecasting trends, analyzing scenarios, optimizing goals, or generating AI insights, this tool equips you with the power to make informed, data-driven decisions that lead to success 🚀. 
-
-Start using **DSSential** today and unlock the full potential of your business with cutting-edge technology!
+MIT. See [LICENSE](LICENSE).
