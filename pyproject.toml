@@ -4,11 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dssential"
-version = "0.2.0"
+version = "0.3.0"
 description = "Local-first validated forecasting and transparent scenario analysis"
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = [
   "mcp>=1.26,<2",
   "numpy>=2.0,<3",

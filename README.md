@@ -17,8 +17,13 @@ optionally narrate the displayed validated summary with your own API key.
   empirical coverage checks.
 - Selects linear trend only when it improves selection-set MAE over the best naive baseline by at
   least 5%; otherwise the result is explicitly `baseline_only`.
-- Records the input fingerprint, specification, method/runtime versions, warnings, limitations,
-  result hash, unique run ID, and stable reproducibility hash.
+- Uses 30 rolling validation points by default (10 each for model selection, interval calibration,
+  and later testing). Smaller datasets may use 18 or more, with an explicit limited-evidence warning
+  whenever any split contains fewer than 10 observations.
+- Records the input fingerprint, specification, method version, package version, source revision,
+  Python runtime, numerical dependency versions, warnings, limitations, result hash, unique run ID,
+  and stable reproducibility hash. Set `DSSENTIAL_SOURCE_REVISION` to an immutable commit or build
+  identifier; runs that cannot identify their source revision say `unavailable` and emit a warning.
 
 ### Transparent scenario preview
 

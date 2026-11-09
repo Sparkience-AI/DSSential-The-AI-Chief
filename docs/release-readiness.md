@@ -4,7 +4,8 @@
 
 - Tests, Ruff, strict mypy, lock verification, source distribution, wheel build, and installed-wheel import pass on the supported matrix.
 - The exact README source-run workflow is exercised on a clean virtual environment.
-- Forecast golden fixtures cover baseline selection, selection/calibration/test separation, interval ordering, reproducibility hashes, malformed timestamps, and resource limits.
+- Forecast golden fixtures cover baseline selection, minimum evidence policy, selection/calibration/test separation,
+  interval ordering, execution identity and reproducibility hashes, malformed timestamps, and resource limits.
 - MCP tests cover payload and metadata bounds, finite scenario arithmetic, no raw-row echo, unsupported capability disclosure, and skill negative routing.
 - Streamlit labels, controls, errors, charts, keyboard flow, contrast, and narrow layout receive a manual accessibility pass before a tagged release.
 

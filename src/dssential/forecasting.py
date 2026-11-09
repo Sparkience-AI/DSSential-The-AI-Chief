@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import json
+import os
+import platform
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from hashlib import sha256
+from importlib.metadata import PackageNotFoundError, version
 from typing import Literal, cast
 from uuid import uuid4
 
@@ -13,6 +16,9 @@ import numpy as np
 import pandas as pd
 
 ModelName = Literal["last_value", "seasonal_naive", "linear_trend"]
+METHOD_VERSION = "transparent-baselines-v2"
+MIN_VALIDATION_POINTS = 18
+RECOMMENDED_VALIDATION_POINTS = 30
 
 
 @dataclass(frozen=True)
@@ -23,7 +29,7 @@ class ForecastSpec:
     horizon: int
     unit: str
     confidence: float = 0.9
-    validation_points: int = 12
+    validation_points: int = RECOMMENDED_VALIDATION_POINTS
     seasonal_period: int | None = None
 
 
@@ -61,8 +67,10 @@ class RunManifest:
     input_fingerprint: str
     method_version: str
     code_version: str
+    source_revision: str
     specification: dict[str, object]
     runtime_versions: dict[str, str]
+    dependency_versions: dict[str, str]
     random_seed: None
     warnings: tuple[str, ...]
     limitations: tuple[str, ...]
@@ -100,9 +108,10 @@ def _validate_spec(spec: ForecastSpec) -> None:
         raise ValueError("Forecast horizon must be between 1 and 365 periods.")
     if not 0.5 <= spec.confidence <= 0.99:
         raise ValueError("Confidence must be between 0.50 and 0.99.")
-    if spec.validation_points < 12:
+    if spec.validation_points < MIN_VALIDATION_POINTS:
         raise ValueError(
-            "At least 12 rolling validation points are required for selection, calibration, and test splits."
+            f"At least {MIN_VALIDATION_POINTS} rolling validation points are required so selection, "
+            "calibration, and test splits each contain at least 6 observations."
         )
     if spec.seasonal_period is not None and spec.seasonal_period < 2:
         raise ValueError("Seasonal period must be at least 2 observations.")
@@ -180,7 +189,39 @@ def _metric(actual: np.ndarray, predicted: np.ndarray, model: ModelName) -> Metr
     )
 
 
-def forecast(frame: pd.DataFrame, spec: ForecastSpec, *, input_fingerprint: str) -> ForecastResult:
+def _package_version() -> str:
+    try:
+        return version("dssential")
+    except PackageNotFoundError:
+        return "uninstalled"
+
+
+def _execution_identity(source_revision: str | None) -> tuple[str, str, dict[str, str], dict[str, str]]:
+    code_version = _package_version()
+    resolved_revision = source_revision if source_revision is not None else os.environ.get("DSSENTIAL_SOURCE_REVISION")
+    if resolved_revision is None:
+        resolved_revision = "unavailable"
+    if not resolved_revision.strip():
+        raise ValueError("Source revision cannot be blank.")
+    runtime_versions = {
+        "python": platform.python_version(),
+        "implementation": platform.python_implementation(),
+    }
+    dependency_versions = {
+        "dssential": code_version,
+        "numpy": np.__version__,
+        "pandas": pd.__version__,
+    }
+    return code_version, resolved_revision, runtime_versions, dependency_versions
+
+
+def forecast(
+    frame: pd.DataFrame,
+    spec: ForecastSpec,
+    *,
+    input_fingerprint: str,
+    source_revision: str | None = None,
+) -> ForecastResult:
     """Validate, backtest, select, and fit a small transparent model family."""
     series = _prepare(frame.copy(deep=True), spec)
     values = series.to_numpy(dtype=float)
@@ -235,10 +276,28 @@ def forecast(frame: pd.DataFrame, spec: ForecastSpec, *, input_fingerprint: str)
         for timestamp, value in zip(future_index, predicted, strict=True)
     )
     spec_payload = asdict(spec)
-    reproducibility_hash = sha256(
-        json.dumps({"input": input_fingerprint, "spec": spec_payload}, sort_keys=True).encode()
-    ).hexdigest()
+    code_version, resolved_revision, runtime_versions, dependency_versions = _execution_identity(source_revision)
+    reproducibility_identity = {
+        "input": input_fingerprint,
+        "specification": spec_payload,
+        "method_version": METHOD_VERSION,
+        "code_version": code_version,
+        "source_revision": resolved_revision,
+        "runtime_versions": runtime_versions,
+        "dependency_versions": dependency_versions,
+    }
+    reproducibility_hash = sha256(json.dumps(reproducibility_identity, sort_keys=True).encode()).hexdigest()
     warnings: list[str] = []
+    if resolved_revision == "unavailable":
+        warnings.append(
+            "Source revision is unavailable. Set DSSENTIAL_SOURCE_REVISION to an immutable commit or build "
+            "identifier for fully traceable reproducibility evidence."
+        )
+    if min(selection_count, calibration_count, test_count) < 10:
+        warnings.append(
+            "Limited validation evidence: at least one selection, calibration, or test split has fewer than "
+            f"10 observations. Use {RECOMMENDED_VALIDATION_POINTS} or more validation points when the series allows."
+        )
     if not improves_baseline:
         warnings.append(
             "Evidence is insufficient to prefer linear trend: it did not improve rolling MAE "
@@ -281,10 +340,12 @@ def forecast(frame: pd.DataFrame, spec: ForecastSpec, *, input_fingerprint: str)
             reproducibility_hash=reproducibility_hash,
             created_at=datetime.now(UTC).isoformat(),
             input_fingerprint=input_fingerprint,
-            method_version="transparent-baselines-v1",
-            code_version="0.2.0",
+            method_version=METHOD_VERSION,
+            code_version=code_version,
+            source_revision=resolved_revision,
             specification=spec_payload,
-            runtime_versions={"numpy": np.__version__, "pandas": pd.__version__},
+            runtime_versions=runtime_versions,
+            dependency_versions=dependency_versions,
             random_seed=None,
             warnings=tuple(warnings),
             limitations=limitations,
