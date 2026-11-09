@@ -47,7 +47,7 @@ def validated_forecast_csv(
     horizon: int,
     unit: str,
     confidence: float = 0.9,
-    validation_points: int = 12,
+    validation_points: int = 30,
     seasonal_period: int | None = None,
 ) -> dict[str, object]:
     """Run the validated forecast workflow on a bounded UTF-8 CSV payload."""

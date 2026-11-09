@@ -97,7 +97,13 @@ def _forecast_page(snapshot: DatasetSnapshot, config: NarrationConfig) -> None:
     confidence = c6.slider("Empirical interval confidence", 0.50, 0.99, 0.90, 0.01)
     seasonal_enabled = st.checkbox("Add an explicit seasonal-naive baseline")
     seasonal_period = st.number_input("Season length in observations", 2, 365, 7) if seasonal_enabled else None
-    validation_points = st.slider("Rolling validation points", 12, 60, 15)
+    validation_points = st.slider(
+        "Rolling validation points",
+        18,
+        120,
+        30,
+        help="30 or more provides at least 10 observations for model selection, interval calibration, and testing.",
+    )
     if st.button("Run validated forecast", type="primary"):
         spec = ForecastSpec(
             timestamp,
