@@ -22,8 +22,8 @@ optionally narrate the displayed validated summary with your own API key.
   whenever any split contains fewer than 10 observations.
 - Records the input fingerprint, specification, method version, package version, source revision,
   Python runtime, numerical dependency versions, warnings, limitations, result hash, unique run ID,
-  and stable reproducibility hash. Set `DSSENTIAL_SOURCE_REVISION` to a commit or build identifier;
-  packaged runs otherwise identify the installed DSSential version.
+  and stable reproducibility hash. Set `DSSENTIAL_SOURCE_REVISION` to an immutable commit or build
+  identifier; runs that cannot identify their source revision say `unavailable` and emit a warning.
 
 ### Transparent scenario preview
 

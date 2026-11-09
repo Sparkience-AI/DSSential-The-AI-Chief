@@ -93,6 +93,8 @@ def test_run_identity_is_unique_but_reproducibility_hash_is_stable() -> None:
     second = forecast(frame, spec, input_fingerprint="abc")
     assert first.manifest.run_id != second.manifest.run_id
     assert first.manifest.reproducibility_hash == second.manifest.reproducibility_hash
+    assert first.manifest.source_revision == "unavailable"
+    assert any("Source revision is unavailable" in warning for warning in first.warnings)
 
 
 def test_manifest_records_execution_identity_and_source_revision() -> None:

@@ -200,7 +200,7 @@ def _execution_identity(source_revision: str | None) -> tuple[str, str, dict[str
     code_version = _package_version()
     resolved_revision = source_revision if source_revision is not None else os.environ.get("DSSENTIAL_SOURCE_REVISION")
     if resolved_revision is None:
-        resolved_revision = f"package:dssential@{code_version}"
+        resolved_revision = "unavailable"
     if not resolved_revision.strip():
         raise ValueError("Source revision cannot be blank.")
     runtime_versions = {
@@ -288,6 +288,11 @@ def forecast(
     }
     reproducibility_hash = sha256(json.dumps(reproducibility_identity, sort_keys=True).encode()).hexdigest()
     warnings: list[str] = []
+    if resolved_revision == "unavailable":
+        warnings.append(
+            "Source revision is unavailable. Set DSSENTIAL_SOURCE_REVISION to an immutable commit or build "
+            "identifier for fully traceable reproducibility evidence."
+        )
     if min(selection_count, calibration_count, test_count) < 10:
         warnings.append(
             "Limited validation evidence: at least one selection, calibration, or test split has fewer than "
